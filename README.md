@@ -1,1 +1,1 @@
-Project for 3rd year IT student 
+Project for 3rd year computer science student
