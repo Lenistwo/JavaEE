@@ -10,11 +10,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Optional;
 
 @WebServlet("/updateStudent")
 public class UpdateStudentServlet extends HttpServlet {
 
     private final StudentRepository repository;
+    private Optional<String> studentID;
 
     public UpdateStudentServlet() {
         repository = new StudentRepository();
@@ -22,17 +24,17 @@ public class UpdateStudentServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String studentID = req.getParameter("id");
+        studentID = Optional.ofNullable(req.getParameter("id"));
 
-        if (studentID == null) {
+        if (!studentID.isPresent()) {
             resp.setStatus(404);
             getServletContext().getRequestDispatcher("/view/error/studentNotFound.jsp").forward(req, resp);
             return;
         }
 
-        Students student = repository.getSingleStudent(Integer.parseInt(studentID));
+        Optional<Students> student = Optional.ofNullable(repository.getSingleStudent(Integer.parseInt(studentID.get())));
 
-        if (student == null) {
+        if (!student.isPresent()) {
             resp.setStatus(404);
             getServletContext().getRequestDispatcher("/view/error/studentNotFound.jsp").forward(req, resp);
             return;
@@ -46,8 +48,8 @@ public class UpdateStudentServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String studentID = req.getParameter("id");
-        if (studentID == null) {
+        studentID = Optional.ofNullable(req.getParameter("id"));
+        if (!studentID.isPresent()) {
             resp.setStatus(404);
             getServletContext().getRequestDispatcher("/view/error/studentNotFound.jsp").forward(req, resp);
             return;
@@ -57,20 +59,20 @@ public class UpdateStudentServlet extends HttpServlet {
         LocalDate date = LocalDate.parse(req.getParameter("date"));
         String city = req.getParameter("city");
 
-        Students student = repository.getSingleStudent(Integer.parseInt(studentID));
+        Optional<Students> student = Optional.ofNullable(repository.getSingleStudent(Integer.parseInt(studentID.get())));
 
-        if (student == null) {
+        if (!student.isPresent()) {
             resp.setStatus(404);
             getServletContext().getRequestDispatcher("/view/error/studentNotFound.jsp").forward(req, resp);
             return;
         }
 
-        student.setName(name);
-        student.setSurname(surname);
-        student.setDate(date);
-        student.setCity(city);
+        student.get().setName(name);
+        student.get().setSurname(surname);
+        student.get().setDate(date);
+        student.get().setCity(city);
 
-        repository.updateStudent(student);
+        repository.updateStudent(student.get());
         String url = "/view/student/studentList.jsp";
         getServletContext().getRequestDispatcher(url).forward(req, resp);
     }

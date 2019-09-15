@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 @WebServlet("/deleteSpecialization")
 public class DeleteSpecializationServlet extends HttpServlet {
@@ -20,15 +21,15 @@ public class DeleteSpecializationServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String specializationID = req.getParameter("id");
+        Optional<String> specializationID = Optional.ofNullable(req.getParameter("id"));
 
-        if (specializationID == null) {
+        if (!specializationID.isPresent()) {
             resp.setStatus(404);
             getServletContext().getRequestDispatcher("/view/error/specializationNotFound.jsp").forward(req, resp);
             return;
         }
 
-        repository.deleteSpecialization(Integer.valueOf(specializationID));
+        repository.deleteSpecialization(Integer.valueOf(specializationID.get()));
 
         String url = "/view/specialization/specializationList.jsp";
 

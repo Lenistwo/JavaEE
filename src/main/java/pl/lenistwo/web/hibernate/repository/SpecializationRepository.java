@@ -3,12 +3,12 @@ package pl.lenistwo.web.hibernate.repository;
 import org.hibernate.Session;
 import pl.lenistwo.web.hibernate.configuration.HibernateConfig;
 import pl.lenistwo.web.hibernate.entities.Specializations;
-import pl.lenistwo.web.hibernate.interfaces.SpecializationDAOInterface;
+import pl.lenistwo.web.hibernate.interfaces.SpecializationDAO;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SpecializationRepository implements SpecializationDAOInterface {
+public class SpecializationRepository implements SpecializationDAO {
 
     private final HibernateActions actions;
 

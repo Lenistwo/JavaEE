@@ -12,12 +12,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @WebServlet("/updateGroup")
 public class UpdateGroupServlet extends HttpServlet {
 
     private final GroupRepository groupRepository;
     private final SpecializationRepository specializationRepository;
+    private Optional<String> groupID;
 
     public UpdateGroupServlet() {
         groupRepository = new GroupRepository();
@@ -26,14 +28,14 @@ public class UpdateGroupServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String groupID = req.getParameter("id");
+        groupID = Optional.ofNullable(req.getParameter("id"));
 
-        if (groupID == null) {
+        if (!groupID.isPresent()) {
             resp.setStatus(404);
             getServletContext().getRequestDispatcher("/view/error/groupNotFound.jsp").forward(req, resp);
             return;
         }
-        Groups groups = groupRepository.getSingleGroup(Integer.valueOf(groupID));
+        Groups groups = groupRepository.getSingleGroup(Integer.valueOf(groupID.get()));
         List<Specializations> specializations = specializationRepository.getAllSpecializations();
         Specializations spec = groups.getId_spec();
         specializations.remove(spec);
@@ -46,29 +48,30 @@ public class UpdateGroupServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String groupID = req.getParameter("id");
+        groupID = Optional.ofNullable(req.getParameter("id"));
         String name = req.getParameter("name");
         byte academicalYear = Byte.parseByte(req.getParameter("academical_year"));
         Integer specializationId = Integer.parseInt(req.getParameter("specialization"));
-        if (groupID == null) {
+
+        if (!groupID.isPresent()) {
             resp.setStatus(404);
             getServletContext().getRequestDispatcher("/view/error/groupNotFound.jsp").forward(req, resp);
             return;
         }
-        Groups group = groupRepository.getSingleGroup(Integer.valueOf(groupID));
+        Optional<Groups> group = Optional.ofNullable(groupRepository.getSingleGroup(Integer.valueOf(groupID.get())));
 
-        if (group == null) {
+        if (!group.isPresent()) {
             String url = "/listOfGroups";
             getServletContext().getRequestDispatcher(url).forward(req, resp);
             return;
         }
 
-        group.setName(name);
-        group.setAcademical_year(academicalYear);
+        group.get().setName(name);
+        group.get().setAcademical_year(academicalYear);
         Specializations spec = specializationRepository.getSingleSpecialization(specializationId);
-        group.setId_spec(spec);
+        group.get().setId_spec(spec);
 
-        groupRepository.updateGroup(group);
+        groupRepository.updateGroup(group.get());
         String url = "/listOfGroups";
         getServletContext().getRequestDispatcher(url).forward(req, resp);
     }

@@ -4,12 +4,12 @@ import org.hibernate.Session;
 import pl.lenistwo.web.hibernate.configuration.HibernateConfig;
 import pl.lenistwo.web.hibernate.entities.Students;
 import pl.lenistwo.web.hibernate.entities.StudentsGroup;
-import pl.lenistwo.web.hibernate.interfaces.StudentDAOInterface;
+import pl.lenistwo.web.hibernate.interfaces.StudentDAO;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class StudentRepository implements StudentDAOInterface {
+public class StudentRepository implements StudentDAO {
 
     private final Session session;
     private final HibernateActions actions;

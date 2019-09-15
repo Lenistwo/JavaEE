@@ -9,11 +9,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 @WebServlet("/updateSpecialization")
 public class UpdateSpecialization extends HttpServlet {
 
     private final SpecializationRepository repository;
+    private Optional<String> specializationID;
 
     public UpdateSpecialization() {
         repository = new SpecializationRepository();
@@ -21,16 +23,16 @@ public class UpdateSpecialization extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String specializationID = req.getParameter("id");
+        specializationID = Optional.ofNullable(req.getParameter("id"));
 
-        if (specializationID == null) {
+        if (!specializationID.isPresent()) {
             resp.setStatus(404);
             getServletContext().getRequestDispatcher("/view/error/specializationNotFound.jsp").forward(req, resp);
             return;
         }
 
-        Specializations specializations = repository.getSingleSpecialization(Integer.parseInt(specializationID));
-        if (specializations == null) {
+        Optional<Specializations> specializations = Optional.ofNullable(repository.getSingleSpecialization(Integer.parseInt(specializationID.get())));
+        if (specializations.isPresent()) {
             String url = "/listOfSpecializations";
             getServletContext().getRequestDispatcher(url).forward(req, resp);
             return;
@@ -43,21 +45,21 @@ public class UpdateSpecialization extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String specializationID = req.getParameter("id");
+        specializationID = Optional.ofNullable(req.getParameter("id"));
         String name = req.getParameter("name");
-        if (specializationID == null) {
+        if (!specializationID.isPresent()) {
             resp.setStatus(404);
             getServletContext().getRequestDispatcher("/view/error/specializationNotFound.jsp").forward(req, resp);
             return;
         }
-        Specializations specializations = repository.getSingleSpecialization(Integer.parseInt(specializationID));
-        if (specializations == null) {
+        Optional<Specializations> specializations = Optional.ofNullable(repository.getSingleSpecialization(Integer.parseInt(specializationID.get())));
+        if (!specializations.isPresent()) {
             String url = "/listOfSpecializations";
             getServletContext().getRequestDispatcher(url).forward(req, resp);
             return;
         }
-        specializations.setName(name);
-        repository.updateSpecialization(specializations);
+        specializations.get().setName(name);
+        repository.updateSpecialization(specializations.get());
         String url = "/listOfSpecializations";
         getServletContext().getRequestDispatcher(url).forward(req, resp);
     }

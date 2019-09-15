@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 @WebServlet("/deleteStudent")
 public class DeleteStudentServlet extends HttpServlet {
@@ -20,13 +21,13 @@ public class DeleteStudentServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String studentID = req.getParameter("id");
-        if (studentID == null) {
+        Optional<String> studentID = Optional.ofNullable(req.getParameter("id"));
+        if (!studentID.isPresent()) {
             resp.setStatus(404);
             getServletContext().getRequestDispatcher("/view/error/studentNotFound.jsp").forward(req, resp);
             return;
         }
-        repository.deleteStudent(Integer.parseInt(studentID));
+        repository.deleteStudent(Integer.parseInt(studentID.get()));
         String url = "/listOfStudents";
         getServletContext().getRequestDispatcher(url).forward(req, resp);
 

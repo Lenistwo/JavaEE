@@ -3,12 +3,12 @@ package pl.lenistwo.web.hibernate.repository;
 import org.hibernate.Session;
 import pl.lenistwo.web.hibernate.configuration.HibernateConfig;
 import pl.lenistwo.web.hibernate.entities.Groups;
-import pl.lenistwo.web.hibernate.interfaces.GroupDAOInterface;
+import pl.lenistwo.web.hibernate.interfaces.GroupDAO;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GroupRepository implements GroupDAOInterface {
+public class GroupRepository implements GroupDAO {
 
     private final HibernateActions actions;
 
